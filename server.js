@@ -1,6 +1,11 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose'); 
+
+var Message = mongoose.model('message', {
+	msg: String
+})
 
 app.use(bodyParser.json());
 
@@ -12,7 +17,24 @@ app.use(function(req, res, next) {
 
 app.post('/api/message',  function(req, res) {
 	console.log(req.body);
+
+	var message = new Message(req.body);
+	message.save();
+
 	res.status(200);
+});
+
+function GetMessages() {
+	Message.find({}).exec(function(err, res) {
+		console.log(res);
+	})
+}
+
+mongoose.connect('mongodb://localhost:27017/test', function(err, db) {
+	if(!err) {
+		console.log('Connected with Mongo');
+		GetMessages();
+	}
 });
 
 var server = app.listen(5000, function(){
